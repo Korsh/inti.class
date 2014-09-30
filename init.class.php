@@ -1,6 +1,6 @@
 <?php
 
-    final class init
+    final class Init
     {
 
         private $db;
