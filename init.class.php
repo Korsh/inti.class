@@ -1,5 +1,8 @@
 <?php
-
+    
+    /**
+     * @author Arzhanov Andrey <arzhan87@gmail.com>
+     */
     final class Init
     {
 
