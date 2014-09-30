@@ -6,15 +6,16 @@
         private $db;
         private $resultArr;
         private $sriptNameArr;
-        /*
-        *
-        *
-        */
-        function init($DBH)
+        
+        /**
+         * Constructor
+         * @param resource $DBH Connection to the DataBase
+         * 
+         * @return void
+         */
+        function __construct($DBH) 
         {
             $this->db = $DBH;
-            $this->create();
-            $this->fill();
             $this->resultArr = array(
                 0 => "normal",
                 1 => "illegal",
@@ -30,14 +31,38 @@
                 4 => "script5",
                 5 => "script6",
                 6 => "script7",
-            )
+            )            
         }
         
-        /*
-        *
-        *
-        */
-        function private create()
+        /**
+         * Destructor
+         * 
+         * @return void
+         */
+        function __destruct()
+        {
+            unset($this->db);
+            unset($this->resultArr);
+            unset($this->scriptNameArr);
+        }
+        
+        /**
+         * public Init() call create(), then fill()
+         * 
+         * @return void
+         */
+        public function init() 
+        {
+            $this->create();
+            $this->fill();
+        }
+        
+        /**
+         * pirivate create() create table test
+         * 
+         * @return void
+         */
+        private function create()
         {
             try {
                 $this->db->execute(
@@ -58,11 +83,12 @@
         }
         
         
-        /*
-        *
-        *
-        */
-        function private fill()
+        /**
+         * private fill() fill table `test` with random values
+         * 
+         * @return void
+         */
+        private function fill()
         {
             try {
                 $insertQuery = $this->db->prepare(
@@ -86,11 +112,12 @@
             }
         }
         
-        /*
-        *
-        *
-        */    
-        function public get()
+        /**
+         * public get() return data with normal and success `result`
+         * 
+         * @return array $returnArr
+         */
+        public function get()
         {
             try {
                 $selectQuery = $this->db->prepare("
