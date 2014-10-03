@@ -24,7 +24,7 @@
                 1 => "illegal",
                 2 => "failed",
                 3 => "success",
-            )
+            );
             
             $this->scriptNameArr = array(
                 0 => "script1",
@@ -34,7 +34,9 @@
                 4 => "script5",
                 5 => "script6",
                 6 => "script7",
-            )            
+            );
+            $this->create();
+            $this->fill();
         }
         
         /**
@@ -50,17 +52,6 @@
         }
         
         /**
-         * public Init() call create(), then fill()
-         * 
-         * @return void
-         */
-        public function init() 
-        {
-            $this->create();
-            $this->fill();
-        }
-        
-        /**
          * pirivate create() create table test
          * 
          * @return void
@@ -68,8 +59,8 @@
         private function create()
         {
             try {
-                $this->db->execute(
-                    "CREATE TABLE `test` (
+                $createTableQuery = $this->db->prepare(
+                    "CREATE TABLE IF NOT EXISTS `test` (
                         `id` int(11) auto_increment not NULL,
                         `script_name` varchar(25) not NULL,
                         `start_time` int(11),
@@ -77,11 +68,11 @@
                         `result` varchar(7),
                         UNIQUE KEY `id`  (`id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8
-                    ");            
+                    ");
+                $createTableQuery->execute();
             }
             catch(PDOException $e) {
                 echo $e->getMessage();
-                file_put_contents('PDOErrors.txt', $e->getMessage(), FILE_APPEND);
             }
         }
         
@@ -98,7 +89,7 @@
                 "INSERT INTO `test`
                     (`script_name`,
                     `start_time`,
-                    `end_time`
+                    `end_time`,
                     `result`) 
                 VALUES
                     (:scriptName,
@@ -107,11 +98,10 @@
                     :result
                     );
                 ");
-                $insertQuery->execute(array(":scriptName" => $this->scriptNameArr[rand(0, sizeof($this->scriptNameArr))], ":result" => $this->resultArr[rand(0, sizeof($this->resultArr))]))
+                $insertQuery->execute(array(":scriptName" => $this->scriptNameArr[rand(0, sizeof($this->scriptNameArr) - 1)], ":result" => $this->resultArr[rand(0, sizeof($this->resultArr))]));
             }
             catch(PDOException $e) {
                 echo $e->getMessage();
-                file_put_contents('PDOErrors.txt', $e->getMessage(), FILE_APPEND);
             }
         }
         
@@ -131,9 +121,9 @@
                     `result`
                 FROM
                     `test`
-                WHERE `result` IN (:resultArr)
-                ;");            
-                $selectQuery->execute(array(':resultArr' => array("normal","success")));
+                WHERE `result` IN ('normal', 'success')
+                ;");
+                $selectQuery->execute();
                 if($selectQuery->rowCount() > 0) {
                     $i = 0;
                     while($row = $selectQuery->fetch()) {
@@ -141,14 +131,13 @@
                         $returnArr[$i]['start_time'] = $row['start_time'];
                         $returnArr[$i]['end_time'] = $row['end_time'];
                         $returnArr[$i]['result'] = $row['result'];
-                        $i++
+                        $i++;
                     }
                     return $returnArr;
                 }
             }
             catch(PDOException $e) {
                 echo $e->getMessage();
-                file_put_contents('PDOErrors.txt', $e->getMessage(), FILE_APPEND);
             }
         }
     }
