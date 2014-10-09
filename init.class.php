@@ -7,9 +7,22 @@
     {
 
         private $db;
-        private $resultArr;
-        private $sriptNameArr;
-        
+        private $resultArr = array(
+            0 => "normal",
+            1 => "illegal",
+            2 => "failed",
+            3 => "success",
+        );
+            
+        private $scriptNameArr = array(
+            0 => "script1",
+            1 => "script2",
+            2 => "script3",
+            3 => "script4",
+            4 => "script5",
+            5 => "script6",
+            6 => "script7",
+        );        
         /**
          * Constructor
          * @param resource $DBH Connection to the DataBase
@@ -19,24 +32,7 @@
         function __construct($DBH) 
         {
             $this->db = $DBH;
-            $this->resultArr = array(
-                0 => "normal",
-                1 => "illegal",
-                2 => "failed",
-                3 => "success",
-            );
-            
-            $this->scriptNameArr = array(
-                0 => "script1",
-                1 => "script2",
-                2 => "script3",
-                3 => "script4",
-                4 => "script5",
-                5 => "script6",
-                6 => "script7",
-            );
-            $this->create();
-            $this->fill();
+            if($this->create())$this->fill();
         }
         
         /**
@@ -70,9 +66,11 @@
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8
                     ");
                 $createTableQuery->execute();
+                return true;
             }
             catch(PDOException $e) {
                 echo $e->getMessage();
+                return false;
             }
         }
         
@@ -98,10 +96,12 @@
                     :result
                     );
                 ");
-                $insertQuery->execute(array(":scriptName" => $this->scriptNameArr[rand(0, sizeof($this->scriptNameArr) - 1)], ":result" => $this->resultArr[rand(0, sizeof($this->resultArr))]));
+                $insertQuery->execute(array(":scriptName" => $this->scriptNameArr[rand(0, count($this->scriptNameArr) - 1)], ":result" => $this->resultArr[rand(0, count($this->resultArr) - 1)]));
+                return true;
             }
             catch(PDOException $e) {
                 echo $e->getMessage();
+                return false;
             }
         }
         
@@ -125,19 +125,19 @@
                 ;");
                 $selectQuery->execute();
                 if($selectQuery->rowCount() > 0) {
-                    $i = 0;
                     while($row = $selectQuery->fetch()) {
-                        $returnArr[$i]['script_name'] = $row['script_name'];
-                        $returnArr[$i]['start_time'] = $row['start_time'];
-                        $returnArr[$i]['end_time'] = $row['end_time'];
-                        $returnArr[$i]['result'] = $row['result'];
-                        $i++;
+                        $returnArr[] = array(
+                            'script_name' => $row['script_name'],
+                            'start_time' => $row['start_time'],
+                            'end_time' => $row['end_time'],
+                            'result' => $row['result']);
                     }
                     return $returnArr;
                 }
             }
             catch(PDOException $e) {
                 echo $e->getMessage();
+                return false;
             }
         }
     }
