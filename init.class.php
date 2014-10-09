@@ -32,7 +32,8 @@
         function __construct($DBH) 
         {
             $this->db = $DBH;
-            if($this->create())$this->fill();
+            if($this->create())
+                $this->fill();
         }
         
         /**
